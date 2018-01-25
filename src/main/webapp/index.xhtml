@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="template/ui.xhtml">
+	<ui:define name="body">
+
+		<script type="text/javascript">
+			function handleDrop(event, ui) {
+				var droppedCar = ui.draggable;
+
+				droppedCar.fadeOut('fast');
+			}
+		</script>
+
+		<h:form id="primeForm2">
+
+			<div style="position: absolute; left: 30%;">
+
+				<p:fieldset id="resumoField" legend="Total" rendered="#{not empty mainController.itensSelecionados}"
+					style="margin-top:20px; min-width: 100px; width: 500px;">
+					<p:outputLabel value="Valor: " />
+					<p:outputLabel value="#{mainController.pedido.valorSemDesconto}">
+						<f:convertNumber type="currency" minFractionDigits="2" pattern="#0.00" />
+					</p:outputLabel>
+					<br />
+					<p:outputLabel value="Desconto: " />
+					<p:outputLabel value="#{mainController.pedido.valorDesconto}">
+						<f:convertNumber type="currency" minFractionDigits="2" pattern="#0.00" />
+					</p:outputLabel>
+					<br />
+					<p:outputLabel value="Total À Pagar: " />
+					<p:outputLabel value="#{mainController.pedido.valor}">
+						<f:convertNumber type="currency" minFractionDigits="2" pattern="#0.00" />
+					</p:outputLabel>
+				</p:fieldset>
+				<p:fieldset id="cardapioField" legend="Cardapio" style="margin-top:20px; min-width: 100px; width: 500px">
+					<p:dataGrid id="itens" var="item" value="#{mainController.itens}" columns="3">
+						<p:panel id="pnl" header="#{item.nome}" style="text-align:left">
+							<h:panelGrid columns="1" style="width:100%; text-align:center;">
+								<h:graphicImage library="img" name="#{item.nome}.png"/>
+							</h:panelGrid>
+						</p:panel>
+						<p:draggable for="pnl" revert="true" handle=".ui-panel-titlebar" stack=".ui-panel" />
+					</p:dataGrid>
+				</p:fieldset>
+				<br />
+				<p:fieldset legend="Selecione o Lanche e arraste até o Pedido." style="display: inline-block;">
+
+					<p:fieldset id="selectedPedidos" legend="Pedido" style="margin-top:20px; min-width: 100px; width: 500px">
+						<p:outputPanel id="dropArea">
+							<h:outputText value="Arraste até aqui seu Lanche!" rendered="#{empty mainController.itensSelecionados}" style="font-size:24px;" />
+							<p:dataTable id="selectedPedidosTable" var="item" value="#{mainController.itensSelecionados}"
+								rendered="#{not empty mainController.itensSelecionados}">
+								<p:column headerText="Nome" style="text-align: center;">
+									<h:outputText value="#{item.nome}" />
+								</p:column>
+								<p:column headerText="Valor" style="text-align: right;">
+									<h:outputText value="#{item.valorSemDesconto}">
+										<f:convertNumber type="currency" minFractionDigits="2" pattern="#0.00" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="Desconto" style="text-align: right;">
+									<h:outputText value="#{item.valorDesconto}">
+										<f:convertNumber type="currency" minFractionDigits="2" pattern="#0.00" />
+									</h:outputText>
+								</p:column>
+								<p:column style="width: 40px;text-align: right;">
+									<p:commandButton update=":primeForm2:display" oncomplete="PF('lancheDialog').show()" icon="ui-icon-plus">
+										<f:setPropertyActionListener value="#{item}" target="#{mainController.selectedLanche}" />
+									</p:commandButton>
+								</p:column>
+							</p:dataTable>
+							<br />
+							<p:commandButton disabled="#{empty mainController.itensSelecionados}" value="Limpar Pedidos" update="primeForm2"
+								action="#{mainController.limpar}" style="float: right;" icon="ui-icon-circle-close" />
+						</p:outputPanel>
+					</p:fieldset>
+					<p:droppable for="selectedPedidos" tolerance="touch" activeStyleClass="ui-state-highlight" datasource="itens" onDrop="handleDrop">
+						<p:ajax listener="#{mainController.onPedidoDrop}" update="primeForm2" />
+					</p:droppable>
+				</p:fieldset>
+
+				<p:dialog header="Detalhe do Lanche" widgetVar="lancheDialog" resizable="true" draggable="false" showEffect="fade" hideEffect="fade"
+					modal="true" width="1000" height="275">
+
+					<p:outputPanel id="display">
+						<h:panelGrid columns="2" cellpadding="5" rendered="#{not empty mainController.selectedLanche}">
+							<p:dataTable id="selectedIngredientesTable" var="item" value="#{mainController.selectedLanche.ingredientes}">
+								<p:column headerText="Ingredientes" style="text-align: center;">
+									<h:outputText value="#{item.nome}" />
+								</p:column>
+								<p:column headerText="Quantidade" style="text-align: right;">
+									<p:inputNumber value="#{item.quantidade}" emptyValue="zero" decimalPlaces="0">
+										<p:ajax update="idValorTotal" />
+									</p:inputNumber>
+								</p:column>
+								<p:column headerText="Valor Unidade" style="text-align: right;">
+									<p:outputLabel value="#{item.valorUnidade}">
+										<f:convertNumber type="currency" minFractionDigits="2" pattern="#0.00" />
+									</p:outputLabel>
+								</p:column>
+								<p:column headerText="Valor Total Sem Desconto" style="text-align: right;">
+									<p:outputLabel id="idValorTotal" value="#{item.valorTotal}" disabled="true" style="width:auto">
+										<f:convertNumber type="currency" minFractionDigits="2" pattern="#0.00" />
+									</p:outputLabel>
+								</p:column>
+							</p:dataTable>
+
+						</h:panelGrid>
+						<p:commandButton value="Confirmar e Calcular Descontos" update="selectedPedidosTable, resumoField"
+							oncomplete="PF('lancheDialog').hide()" style="float: right;" />
+					</p:outputPanel>
+				</p:dialog>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

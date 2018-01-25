@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="template/ui.xhtml">
+	<ui:define name="body">
+		<h:form id="primeForm">
+			<div style="position: absolute; left: 30%;">
+				<p:fieldset legend="Cadastro de Preços de Ingredientes." style="display: inline-block;">
+					<p:fieldset id="selectedIngredientes" legend="Ingredientes" style="margin-top:20px; min-width: 100px; width: 500px">
+						<p:outputPanel id="ingredientesArea">
+							<p:dataTable id="selectedIngredientesTable" var="item" value="#{mainController.ingredientes}">
+								<p:column headerText="Nome" style="min-width: 25px; width: 25px; text-align: center;">
+									<h:outputText value="#{item.nome}" />
+								</p:column>
+								<p:column headerText="Valor" style="min-width: 25px; width: 25px;">
+									<p:inputNumber value="#{item.valorUnidade}" emptyValue="zero" />
+								</p:column>
+							</p:dataTable>
+						</p:outputPanel>
+						<br />
+						<p:commandButton icon="ui-icon-circle-check" value="Confirmar" action="#{mainController.avancar}" style="float: right;" />
+					</p:fieldset>
+				</p:fieldset>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
