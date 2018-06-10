@@ -1,1 +1,5 @@
-lab\view\MainController.class
+br/com/entidades/Pedido.class
+br/com/entidades/TipoIngrediente.class
+br/com/entidades/Ingrediente.class
+br/com/entidades/Lanche.class
+lab/view/MainController.class
